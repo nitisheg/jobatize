@@ -61,7 +61,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF2E2E2E),
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
           margin: const EdgeInsets.all(16),
@@ -203,7 +203,7 @@ If you have questions about this privacy policy, please contact us at [Your Cont
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -226,7 +226,7 @@ If you have questions about this privacy policy, please contact us at [Your Cont
                     },
                     child: const Text(
                       "Back",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                   ElevatedButton(
@@ -243,9 +243,7 @@ If you have questions about this privacy policy, please contact us at [Your Cont
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => SetPassword(),
-                        ),
+                        MaterialPageRoute(builder: (context) => SetPassword()),
                       );
                     },
                     child: const Text(

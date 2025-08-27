@@ -59,7 +59,7 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
           width: 400,
@@ -167,7 +167,7 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
+                        backgroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
@@ -190,7 +190,7 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                       },
                       child: const Text(
                         "Back",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.black),
                       ),
                     ),
                     ElevatedButton(

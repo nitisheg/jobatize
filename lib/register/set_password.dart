@@ -8,7 +8,7 @@ class SetPassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade800,
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
           width: 450,
@@ -16,13 +16,13 @@ class SetPassword extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            // boxShadow: [
+            //   BoxShadow(
+            //     color: Colors.black.withOpacity(0.2),
+            //     blurRadius: 8,
+            //     offset: const Offset(0, 4),
+            //   ),
+            // ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -31,10 +31,7 @@ class SetPassword extends StatelessWidget {
               // Title
               const Text(
                 "Registration",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 16),
@@ -57,10 +54,7 @@ class SetPassword extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Step 8: Set Your Password",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
 
@@ -84,8 +78,10 @@ class SetPassword extends StatelessWidget {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
                 ),
               ),
 
@@ -99,8 +95,10 @@ class SetPassword extends StatelessWidget {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
                 ),
               ),
 
@@ -112,7 +110,7 @@ class SetPassword extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -135,7 +133,7 @@ class SetPassword extends StatelessWidget {
                     },
                     child: const Text(
                       "Back",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                   ElevatedButton(
@@ -152,9 +150,7 @@ class SetPassword extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => SetPassword(),
-                        ),
+                        MaterialPageRoute(builder: (context) => SetPassword()),
                       );
                     },
                     child: const Text(

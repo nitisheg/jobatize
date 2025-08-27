@@ -18,9 +18,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => PersonalDetails(),
-        ),
+        MaterialPageRoute(builder: (context) => PersonalDetails()),
       );
     });
   }
@@ -28,7 +26,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF333333),
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
           width: 350,

@@ -19,7 +19,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF333333),
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
           width: 380,
@@ -76,7 +76,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
+                        backgroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
@@ -100,7 +100,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                       },
                       child: const Text(
                         "Back",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.black),
                       ),
                     ),
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:jobatize_app/register/resume_processing.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/api_provider.dart';
 
 class ResumeUploadScreen extends StatefulWidget {
   const ResumeUploadScreen({super.key});
@@ -40,8 +43,9 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // final api = Provider.of<ApiProvider>(context);
     return Scaffold(
-      backgroundColor: const Color(0xFF335444),
+      backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -109,8 +113,6 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
                       textAlign: TextAlign.left,
                     ),
                     const SizedBox(height: 20),
-
-                    // Upload Box
                     GestureDetector(
                       onTap: _pickFile,
                       child: Container(
@@ -121,47 +123,37 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Center(
-                          child: isProcessing
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    CircularProgressIndicator(),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      "Processing your resume...",
-                                      style: TextStyle(color: Colors.black54),
-                                    ),
-                                  ],
-                                )
-                              : selectedFileName == null
-                              ? const Text(
-                                  "Drag and drop your resume here,\nor click to browse.\n\nSupported formats: PDF, DOC, DOCX",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.black54),
-                                )
-                              : Text(
-                                  "Selected file:\n$selectedFileName",
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
-                                  ),
-                                ),
+                          child: Text(
+                            "Drag and drop your resume here,\nor click to browse.\n\nSupported formats: PDF, DOC, DOCX",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.black54),
+                          ),
                         ),
                       ),
                     ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // Bottom Section
-              TextButton(
-                onPressed: () {},
-                child: const Text(
-                  "Already have an account?  Sign in",
-                  style: TextStyle(color: Colors.white, fontSize: 14),
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(color: Colors.black, fontSize: 14),
+                  children: [
+                    const TextSpan(text: "Already have an account? "),
+                    TextSpan(
+                      text: "Sign in",
+                      style: const TextStyle(
+                        color: Colors.blue, // usually make it look like a link
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      // recognizer: TapGestureRecognizer()
+                      //   ..onTap = () {
+                      //
+                      //   },
+                    ),
+                  ],
                 ),
               ),
             ],

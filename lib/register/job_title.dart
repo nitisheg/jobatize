@@ -65,7 +65,7 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade900,
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
           width: 400,
@@ -73,13 +73,7 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            boxShadow: [],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -166,7 +160,7 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -190,7 +184,7 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
                     },
                     child: const Text(
                       "Back",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                   ElevatedButton(

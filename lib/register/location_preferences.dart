@@ -35,9 +35,7 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(
-        0xFF3C3C3C,
-      ), // dark background like screenshot
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
           width: 450,
@@ -198,7 +196,7 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -221,7 +219,7 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
                     },
                     child: const Text(
                       "Back",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                   ElevatedButton(
