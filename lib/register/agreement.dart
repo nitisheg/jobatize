@@ -74,6 +74,16 @@ class _AgreementScreenState extends State<AgreementScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                alignment: Alignment.center,
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 60,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 10),
               const Text(
                 "Registration",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),

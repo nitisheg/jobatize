@@ -1,9 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:jobatize_app/register/resume_processing.dart';
-import 'package:provider/provider.dart';
-
-import '../providers/api_provider.dart';
 
 class ResumeUploadScreen extends StatefulWidget {
   const ResumeUploadScreen({super.key});
@@ -31,7 +30,8 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => ProcessingScreen(fileName: selectedFileName!),
+          builder: (_) =>
+              ProcessingScreen(cvFile: File(result.files.single.path!)),
         ),
       ).then((_) {
         setState(() {
@@ -43,7 +43,6 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final api = Provider.of<ApiProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -121,6 +120,8 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade400),
                           borderRadius: BorderRadius.circular(10),
+                          backgroundBlendMode: BlendMode.overlay,
+                          color: Colors.grey.shade100,
                         ),
                         child: Center(
                           child: Text(

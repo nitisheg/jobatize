@@ -75,145 +75,164 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [],
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                "Registration",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-              ),
-              const SizedBox(height: 20),
-              LinearProgressIndicator(
-                value: 0.4,
-                backgroundColor: Colors.grey.shade300,
-                color: Color(0xFF2563EB),
-              ),
-              const SizedBox(height: 20),
-
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Step 4: Confirm Previous Job Titles",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Review and edit your past job titles.",
-                  style: TextStyle(color: Colors.black54),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Job Titles List
-              Column(
-                children: jobTitles.map((title) {
-                  return ListTile(
-                    title: Text(title),
-                    trailing: TextButton(
-                      onPressed: () => _removeJobTitle(title),
-                      child: const Text(
-                        "Remove",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 10),
-              TextField(
-                controller: jobController,
-                decoration: InputDecoration(
-                  hintText: "e.g., Software Engineer",
-                  labelText: "Add Another Job Title",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    height: 60,
+                    fit: BoxFit.contain,
                   ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF16A34A),
-                    shape: RoundedRectangleBorder(
+                const SizedBox(height: 10),
+                const Text(
+                  "Registration",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                ),
+                const SizedBox(height: 20),
+                LinearProgressIndicator(
+                  value: 0.4,
+                  backgroundColor: Colors.grey.shade300,
+                  color: Color(0xFF2563EB),
+                ),
+                const SizedBox(height: 20),
+
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Step 4: Confirm Previous Job Titles",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Review and edit your past job titles.",
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Job Titles List
+                Column(
+                  children: jobTitles.map((title) {
+                    return ListTile(
+                      title: Text(title),
+                      trailing: TextButton(
+                        onPressed: () => _removeJobTitle(title),
+                        child: const Text(
+                          "Remove",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+                const SizedBox(height: 10),
+                TextField(
+                  controller: jobController,
+                  decoration: InputDecoration(
+                    hintText: "e.g., Software Engineer",
+                    labelText: "Add Another Job Title",
+                    border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: _addJobTitle,
-                  child: const Text(
-                    "Add Title",
-                    style: TextStyle(color: Colors.white),
-                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-
-              // Navigation Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
+                const SizedBox(height: 2),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
+                      backgroundColor: Color(0xFF16A34A),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
-                      if (Navigator.canPop(context)) {
-                        Navigator.pop(context);
-                      } else {
-                        // Handle case: maybe go to home or upload screen
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PersonalDetails(),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: _addJobTitle,
                     child: const Text(
-                      "Back",
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2563EB),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SuggestedJobTitlesScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      "Next",
+                      "Add Title",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 20),
+
+                // Navigation Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // ElevatedButton(
+                    //   style: ElevatedButton.styleFrom(
+                    //     backgroundColor: Colors.white,
+                    //     padding: const EdgeInsets.symmetric(
+                    //       horizontal: 24,
+                    //       vertical: 12,
+                    //     ),
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(8),
+                    //     ),
+                    //   ),
+                    //   onPressed: () {
+                    //     if (Navigator.canPop(context)) {
+                    //       Navigator.pop(context);
+                    //     } else {
+                    //       // Handle case: maybe go to home or upload screen
+                    //       Navigator.pushReplacement(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //           builder: (context) => PersonalDetails(
+                    //             token: '',
+                    //             fullNameCtrl: '',
+                    //             emailCtrl: '',
+                    //             phoneCtrl: '',
+                    //             currentCityCtrl: '',
+                    //             currentStateCtrl: '',
+                    //           ),
+                    //         ),
+                    //       );
+                    //     }
+                    //   },
+                    //   child: const Text(
+                    //     "Back",
+                    //     style: TextStyle(color: Colors.black),
+                    //   ),
+                    // ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF2563EB),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SuggestedJobTitlesScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Next",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

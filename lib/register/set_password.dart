@@ -28,7 +28,16 @@ class SetPassword extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Title
+              Container(
+                padding: const EdgeInsets.all(16),
+                alignment: Alignment.center,
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 60,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 10),
               const Text(
                 "Registration",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
