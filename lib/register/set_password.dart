@@ -135,7 +135,7 @@ class SetPassword extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AgreementScreen(),
+                            builder: (context) => AgreementScreen(registerData: {},),
                           ),
                         );
                       }

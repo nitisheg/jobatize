@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'job_title.dart';
 import 'location_preferences.dart';
 
 class SuggestedJobTitlesScreen extends StatefulWidget {
-  const SuggestedJobTitlesScreen({super.key});
+  final Map<String, dynamic> registerData; // ✅ keep register data
+
+  const SuggestedJobTitlesScreen({super.key, required this.registerData});
 
   @override
   State<SuggestedJobTitlesScreen> createState() =>
@@ -13,47 +14,43 @@ class SuggestedJobTitlesScreen extends StatefulWidget {
 class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
   final TextEditingController _titleController = TextEditingController();
 
-  final List<Map<String, dynamic>> jobTitles = [
-    {
-      "title": "Office Assistant",
-      "desc":
-          "Experience in assisting in daily office operations and administrative tasks",
-      "selected": false,
-    },
-    {
-      "title": "Communication Coordinator",
-      "desc": "Certificate of excellence in communication skills workshop",
-      "selected": false,
-    },
-    {
-      "title": "Project Coordinator",
-      "desc":
-          "Experience in coordinating with team members and preparing reports",
-      "selected": false,
-    },
-    {
-      "title": "Administrative Assistant",
-      "desc": "Experience in daily office operations and administrative tasks",
-      "selected": false,
-    },
-    {
-      "title": "Content Writer",
-      "desc": "Passion for creative writing",
-      "selected": false,
-    },
-  ];
+  List<Map<String, dynamic>> jobTitles = [];
 
   void _addJobTitle() {
     if (_titleController.text.trim().isNotEmpty) {
       setState(() {
         jobTitles.add({
           "title": _titleController.text.trim(),
-          "desc": "Custom added job title",
-          "selected": true,
+          "desc": "Manually added title.",
+          "selected": false,
         });
         _titleController.clear();
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final suggestedJobTitles =
+        (widget.registerData["suggested_job_titles"] as List<dynamic>? ??
+                widget.registerData["suggestedJobTitles"] as List<dynamic>? ??
+                [])
+            .map((e) => e.toString())
+            .toList();
+
+    final allTitles = {...suggestedJobTitles}.toList();
+
+    jobTitles = [
+      ...allTitles.map(
+        (title) => {
+          "title": title,
+          "desc": "Extracted from CV",
+          "selected": true,
+        },
+      ),
+    ];
   }
 
   @override
@@ -83,6 +80,7 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
                 const Center(
                   child: Text(
                     "Registration",
@@ -90,6 +88,7 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
                 LinearProgressIndicator(
                   value: 0.5,
                   backgroundColor: Colors.grey[300],
@@ -103,7 +102,6 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                   "Step 5: Suggested Job Titles",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-
                 const SizedBox(height: 8),
                 const Text(
                   "Select the job titles you are interested in, or add your own. Suggested titles are pre-selected.",
@@ -111,7 +109,11 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Job Titles List
+                if (jobTitles.isEmpty)
+                  const Text(
+                    "No suggested titles found. Please add manually.",
+                    style: TextStyle(color: Colors.redAccent),
+                  ),
                 ...jobTitles.map(
                   (job) => Card(
                     shape: RoundedRectangleBorder(
@@ -140,7 +142,6 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-
                 TextField(
                   controller: _titleController,
                   decoration: InputDecoration(
@@ -156,7 +157,7 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                   alignment: Alignment.centerLeft,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF16A34A),
+                      backgroundColor: const Color(0xFF16A34A),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -171,7 +172,6 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
 
                 const SizedBox(height: 20),
 
-                // Buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -189,13 +189,6 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                       onPressed: () {
                         if (Navigator.canPop(context)) {
                           Navigator.pop(context);
-                        } else {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => JobTitlesPage(),
-                            ),
-                          );
                         }
                       },
                       child: const Text(
@@ -205,7 +198,7 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF2563EB),
+                        backgroundColor: const Color(0xFF2563EB),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
@@ -215,10 +208,25 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                         ),
                       ),
                       onPressed: () {
+                        final suggestedJobTitles = jobTitles
+                            .where((job) => job["suggested_job_titles"] == true)
+                            .map(
+                              (job) => job["suggested_job_titles"].toString(),
+                            )
+                            .toList();
+
+                        widget.registerData["suggested_job_titles"] =
+                            suggestedJobTitles;
+                        debugPrint(
+                          "Final selected jobTitles: $suggestedJobTitles",
+                        );
+
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LocationPreferencesPage(),
+                            builder: (context) => LocationPreferencesPage(
+                              registerData: widget.registerData,
+                            ),
                           ),
                         );
                       },

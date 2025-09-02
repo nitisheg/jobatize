@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:jobatize_app/register/agreement.dart';
-
-import 'job_title.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LocationPreferencesPage extends StatefulWidget {
-  const LocationPreferencesPage({super.key});
+  final Map<String, dynamic> registerData;
+
+  const LocationPreferencesPage({super.key, required this.registerData});
 
   @override
   State<LocationPreferencesPage> createState() =>
@@ -12,25 +14,109 @@ class LocationPreferencesPage extends StatefulWidget {
 }
 
 class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
-  String? selectedState;
-  String? selectedCity;
+  String? selectedStateId;
+  String? selectedCityId;
   String? jobPreference;
 
-  final List<String> states = [
-    "California",
-    "Texas",
-    "New York",
-    "Florida",
-    "Illinois",
-  ];
+  List<Map<String, dynamic>> states = [];
+  List<Map<String, dynamic>> cities = [];
 
-  final Map<String, List<String>> cities = {
-    "California": ["Los Angeles", "San Diego", "San Jose"],
-    "Texas": ["Houston", "Dallas", "Austin"],
-    "New York": ["New York City", "Buffalo", "Rochester"],
-    "Florida": ["Miami", "Orlando", "Tampa"],
-    "Illinois": ["Chicago", "Springfield", "Naperville"],
-  };
+  @override
+  void initState() {
+    super.initState();
+    _loadStates();
+  }
+
+  // ✅ Load states
+  Future<void> _loadStates() async {
+    try {
+      final response = await http.get(
+        Uri.parse("https://apistaging.jobatize.com/states"),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        final List data = json.decode(response.body);
+        setState(() {
+          states = data
+              .map<Map<String, dynamic>>(
+                (item) => {
+                  "id": item["id"].toString(),
+                  "name": item["state"].toString(),
+                },
+              )
+              .toList();
+        });
+      } else {
+        debugPrint("❌ Failed to fetch states: ${response.body}");
+      }
+    } catch (e) {
+      debugPrint("⚠️ Error fetching states: $e");
+    }
+  }
+
+  // ✅ Load cities based on state_id
+  Future<void> _loadCities(String stateId) async {
+    try {
+      final response = await http.get(
+        Uri.parse("https://appstaging.jobatize.com/city.json"),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        final List allCities = data["cities"];
+
+        setState(() {
+          cities = allCities
+              .where((city) => city["state_id"].toString() == stateId)
+              .map<Map<String, dynamic>>(
+                (city) => {
+                  "id": city["id"].toString(),
+                  "name": city["city"].toString(),
+                },
+              )
+              .toList();
+
+          selectedCityId = null; // reset city when state changes
+        });
+      } else {
+        debugPrint("❌ Failed to fetch cities: ${response.body}");
+      }
+    } catch (e) {
+      debugPrint("⚠️ Error fetching cities: $e");
+    }
+  }
+
+  void _goNext() {
+    // ✅ Find selected state & city names
+    final selectedState = states.firstWhere(
+      (state) => state["id"] == selectedStateId,
+      orElse: () => {},
+    );
+    final selectedCity = cities.firstWhere(
+      (city) => city["id"] == selectedCityId,
+      orElse: () => {},
+    );
+
+    // ✅ Save to registerData
+    widget.registerData["preferred_state_id"] = selectedStateId ?? "";
+    widget.registerData["preferred_state_name"] = selectedState["name"] ?? "";
+    widget.registerData["preferred_city_id"] = selectedCityId ?? "";
+    widget.registerData["preferred_city_name"] = selectedCity["name"] ?? "";
+    widget.registerData["apply_for_jobs_in"] = jobPreference ?? "";
+
+    debugPrint("📍 Location Data: ${widget.registerData}");
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            AgreementScreen(registerData: widget.registerData),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,77 +144,74 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
                     fit: BoxFit.contain,
                   ),
                 ),
-                const SizedBox(height: 10),              const Center(
+                const SizedBox(height: 10),
+                const Center(
                   child: Text(
                     "Registration",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
                   ),
                 ),
                 const SizedBox(height: 20),
-            
-                // Progress bar
+
+                /// Progress bar
                 LinearProgressIndicator(
-                  value: 0.6, // Step 6/10 = 0.6
+                  value: 0.6,
                   backgroundColor: Colors.grey[300],
-                  color: Color(0xFF2563EB),
+                  color: const Color(0xFF2563EB),
                 ),
                 const SizedBox(height: 20),
-            
-                // Step Title
+
+                /// Step Title
                 const Text(
                   "Step 6: Location Preferences",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
-            
+
                 const Text(
                   "Tell us where you're looking for jobs.",
                   style: TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(height: 20),
-                DropdownButtonFormField<String>(
-                  value: selectedState,
-                  decoration: const InputDecoration(
-                    labelText: "Preferred Location (State/Province/Region)",
-                    border: OutlineInputBorder(),
-                  ),
-                  items: states.map((state) {
-                    return DropdownMenuItem(value: state, child: Text(state));
+
+                /// State Dropdown
+                DropdownButton<String>(
+                  hint: const Text("Select State"),
+                  value: selectedStateId,
+                  isExpanded: true,
+                  items: states.map<DropdownMenuItem<String>>((state) {
+                    return DropdownMenuItem<String>(
+                      value: state["id"].toString(),
+                      child: Text(state["name"]),
+                    );
                   }).toList(),
                   onChanged: (value) {
                     setState(() {
-                      selectedState = value;
-                      selectedCity = null;
+                      selectedStateId = value;
+                      _loadCities(value!);
                     });
                   },
                 ),
                 const SizedBox(height: 15),
-            
-                DropdownButtonFormField<String>(
-                  value: selectedCity,
-                  decoration: const InputDecoration(
-                    labelText: "Preferred Location (Town/City)",
-                    border: OutlineInputBorder(),
-                  ),
-                  items: selectedState == null
-                      ? []
-                      : cities[selectedState]!
-                            .map(
-                              (city) => DropdownMenuItem(
-                                value: city,
-                                child: Text(city),
-                              ),
-                            )
-                            .toList(),
+
+                DropdownButton<String>(
+                  hint: const Text("Select City"),
+                  value: selectedCityId,
+                  isExpanded: true,
+                  items: cities.map<DropdownMenuItem<String>>((city) {
+                    return DropdownMenuItem<String>(
+                      value: city["id"].toString(),
+                      child: Text(city["name"]),
+                    );
+                  }).toList(),
                   onChanged: (value) {
                     setState(() {
-                      selectedCity = value;
+                      selectedCityId = value;
                     });
                   },
                 ),
+
                 const SizedBox(height: 20),
-            
-                // Radio buttons
                 const Text(
                   "Apply for jobs in",
                   style: TextStyle(fontWeight: FontWeight.w600),
@@ -144,13 +227,12 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
                       value: "local",
                       groupValue: jobPreference,
                       onChanged: (value) =>
-                          setState(() => jobPreference = value!),
+                          setState(() => jobPreference = value),
+                      dense: true,
                       visualDensity: const VisualDensity(
                         horizontal: 0,
                         vertical: -4,
                       ),
-                      contentPadding: EdgeInsets.zero,
-                      dense: true, // makes it smaller
                     ),
                     RadioListTile<String>(
                       title: const Text(
@@ -160,13 +242,12 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
                       value: "statewide",
                       groupValue: jobPreference,
                       onChanged: (value) =>
-                          setState(() => jobPreference = value!),
+                          setState(() => jobPreference = value),
+                      dense: true,
                       visualDensity: const VisualDensity(
                         horizontal: 0,
                         vertical: -4,
                       ),
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
                     ),
                     RadioListTile<String>(
                       title: const Text(
@@ -176,26 +257,27 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
                       value: "relocate",
                       groupValue: jobPreference,
                       onChanged: (value) =>
-                          setState(() => jobPreference = value!),
+                          setState(() => jobPreference = value),
+                      dense: true,
                       visualDensity: const VisualDensity(
                         horizontal: 0,
                         vertical: -4,
                       ),
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
                     ),
                     RadioListTile<String>(
-                      title: const Text("Remote", style: TextStyle(fontSize: 14)),
+                      title: const Text(
+                        "Remote",
+                        style: TextStyle(fontSize: 14),
+                      ),
                       value: "remote",
                       groupValue: jobPreference,
                       onChanged: (value) =>
-                          setState(() => jobPreference = value!),
+                          setState(() => jobPreference = value),
+                      dense: true,
                       visualDensity: const VisualDensity(
                         horizontal: 0,
                         vertical: -4,
                       ),
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
                     ),
                   ],
                 ),
@@ -217,13 +299,6 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
                       onPressed: () {
                         if (Navigator.canPop(context)) {
                           Navigator.pop(context);
-                        } else {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => JobTitlesPage(),
-                            ),
-                          );
                         }
                       },
                       child: const Text(
@@ -242,14 +317,7 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AgreementScreen(),
-                          ),
-                        );
-                      },
+                      onPressed: _goNext,
                       child: const Text(
                         "Next",
                         style: TextStyle(color: Colors.white),

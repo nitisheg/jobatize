@@ -30,11 +30,9 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
         Uri.parse('https://apistaging.jobatize.com/parse_cv/'),
       );
 
-      // 🔑 Hardcoded token
       request.headers['Authorization'] =
           'IYIPy4728BDS8CIqQLmIqbL1kANdinIU0jH2bbOj41BzBaAWD0GDr44gL9AxJQySlrx2FXufgHQW7kjS92oiGsmBuVnAvq8XWh2KrP5Bbd2cMf8L4FmFtcfFAtgKGcrE';
 
-      // Attach CV file
       request.files.add(
         await http.MultipartFile.fromPath('file', widget.cvFile.path),
       );
@@ -53,21 +51,38 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
             ? json.decode(firstDecode)
             : firstDecode;
 
-        // ✅ Safely map values
         final personalInfo = data['personal_information'] ?? {};
         final fullName = personalInfo['name'] ?? "John Doe";
         final emailCtrl = personalInfo['email'] ?? "johndoe@email.com";
         final phoneCtrl = personalInfo['phone'] ?? "9999999999";
         final location = personalInfo['location'] ?? "New Delhi, Delhi";
 
-        // split location into city & state if possible
         final parts = location.split(',');
         final currentCityCtrl = parts.isNotEmpty
             ? parts.first.trim()
             : "New Delhi";
         final currentStateCtrl = parts.length > 1 ? parts.last.trim() : "Delhi";
 
-        // ✅ Navigate with parsed data
+        final workHistory = data['work_history'] as List<dynamic>? ?? [];
+
+        final prevJobTitles = workHistory
+            .map((job) => job['job_title']?.toString() ?? "")
+            .where((title) => title.isNotEmpty)
+            .toList();
+
+        print("📝 Extracted Job Titles: $prevJobTitles");
+
+        final suggestedJobTitles = workHistory
+            .map((job) => job['suggested_job_titles']?.toString() ?? "")
+            .where((title) => title.isNotEmpty)
+            .toList();
+
+        print("📝 Extracted Job Titles: $suggestedJobTitles");
+
+
+
+
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -75,12 +90,14 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
               token:
                   '0GRZWIUy1pPH3Y7RoLHtEOSRCRMQufOVD0Sh3RuDZnymcaSrX0eI4N6KFGYoyIDN4wRvGX5mEQ16w1M99WO8NXddEQMmXIjaA0MZzS3MQBYkZtFnhPymgNkPN0FAgv75',
 
-              // 🔑 Wrap Strings inside TextEditingController
               fullNameCtrl: TextEditingController(text: fullName),
               emailCtrl: TextEditingController(text: emailCtrl),
               phoneCtrl: TextEditingController(text: phoneCtrl),
               currentCityCtrl: TextEditingController(text: currentCityCtrl),
-              currentStateCtrl: TextEditingController(text: currentStateCtrl),
+              currentStateCtrl: TextEditingController(text: currentStateCtrl),  registerData: {
+              "prev_job_titles": prevJobTitles,
+              "suggestedJobTitles": suggestedJobTitles,
+            },
             ),
           ),
         );
@@ -118,7 +135,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
               ),
               const SizedBox(height: 10),
               const Text(
-                "Processing Your Resume...",
+                "Step 2: Processing Your Resume...",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 20),

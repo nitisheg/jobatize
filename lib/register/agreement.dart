@@ -3,7 +3,7 @@ import 'package:jobatize_app/register/location_preferences.dart';
 import 'package:jobatize_app/register/set_password.dart';
 
 class AgreementScreen extends StatefulWidget {
-  const AgreementScreen({super.key});
+  const AgreementScreen({super.key, required Map<String, dynamic> registerData});
 
   @override
   State<AgreementScreen> createState() => _AgreementScreenState();
@@ -229,7 +229,7 @@ If you have questions about this privacy policy, please contact us at [Your Cont
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LocationPreferencesPage(),
+                            builder: (context) => LocationPreferencesPage(registerData: {},),
                           ),
                         );
                       }

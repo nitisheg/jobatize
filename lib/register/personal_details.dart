@@ -13,6 +13,7 @@ class PersonalDetails extends StatefulWidget {
   final TextEditingController phoneCtrl;
   final TextEditingController currentCityCtrl;
   final TextEditingController currentStateCtrl;
+  final Map<String, dynamic> registerData;
 
   const PersonalDetails({
     super.key,
@@ -23,6 +24,7 @@ class PersonalDetails extends StatefulWidget {
     required this.phoneCtrl,
     required this.currentCityCtrl,
     required this.currentStateCtrl,
+    required this.registerData,
   });
 
   @override
@@ -55,22 +57,27 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       var response = await dio.post(
         "https://apistaging.jobatize.com/parse_cv/",
         data: formData,
-        options: Options(
-          headers: {
-            "Authorization": "Bearer ${widget.token}",
-          },
-        ),
+        options: Options(headers: {"Authorization": "Bearer ${widget.token}"}),
       );
 
       if (response.statusCode == 200) {
         var data = response.data;
 
+        // Save whole response as resume_json
+        widget.registerData["resume_json"] = data;
+
+        var personalInfo = data["personal_information"] ?? {};
+        var location = personalInfo["location"] ?? "";
+        var parts = location.split(",");
+
         setState(() {
-          widget.fullNameCtrl.text = data["full_name"] ?? "";
-          widget.emailCtrl.text = data["email"] ?? "";
-          widget.phoneCtrl.text = data["phone"] ?? "";
-          widget.currentCityCtrl.text = data["current_city"] ?? "";
-          widget.currentStateCtrl.text = data["current_state"] ?? "";
+          widget.fullNameCtrl.text = personalInfo["name"] ?? "";
+          widget.emailCtrl.text = personalInfo["email"] ?? "";
+          widget.phoneCtrl.text = personalInfo["phone"] ?? "";
+          widget.currentCityCtrl.text = parts.isNotEmpty ? parts[0].trim() : "";
+          widget.currentStateCtrl.text = parts.length > 1
+              ? parts[1].trim()
+              : "";
         });
       }
     } catch (e) {
@@ -81,47 +88,108 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   }
 
   /// ------------------ API: Submit Personal Details ------------------
-  Future<void> _submitPersonalDetails() async {
-    setState(() => isLoading = true);
+  Future<void> _goToNextPage() async {
+    // Save personal details into registerData but don't submit yet
+    widget.registerData.addAll({
+      "full_name": widget.fullNameCtrl.text.trim(),
+      "email": widget.emailCtrl.text.trim(),
+      "phone": widget.phoneCtrl.text.trim(),
+      "current_city": widget.currentCityCtrl.text.trim(),
+      "current_state": widget.currentStateCtrl.text.trim(),
+      "agreed_terms": true,
+      "agreed_privacy": true,
+      "role_id": 2,
+      "password": widget.registerData["password"] ?? "12345678",
+      "resume_path": widget.resumeFile?.path.split("/").last ?? "",
+      "resume_json": widget.registerData["resume_json"] ?? "{}",
+      "apply_for_jobs_in": widget.registerData["apply_for_jobs_in"] ?? "IT",
+      "prev_job_titles": widget.registerData["prev_job_titles"] ?? [],
+      "suggested_job_titles": widget.registerData["suggested_job_titles"] ?? [],
+      "preferred_city_id": widget.registerData["preferred_city_id"] ?? 0,
+      "preferred_state_id": widget.registerData["preferred_state_id"] ?? 0,
+      "preferred_city": widget.registerData["preferred_city"] ?? "",
+      "preferred_state": widget.registerData["preferred_state"] ?? "",
+    });
 
-    try {
-      var dio = Dio();
-      var response = await dio.post(
-        "https://apistaging.jobatize.com/register_user/",
-        data: {
-          "full_name": widget.fullNameCtrl.text,
-          "email": widget.emailCtrl.text,
-          "phone": widget.phoneCtrl.text,
-          "current_city": widget.currentCityCtrl.text,
-          "current_state": widget.currentStateCtrl.text,
-        },
-        options: Options(
-          headers: {
-            "Authorization": "Bearer ${widget.token}",
-            "Content-Type": "application/json",
-          },
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => JobTitlesPage(
+          registerData: widget.registerData,
         ),
-      );
+      ),
+    );
 
-      if (response.statusCode == 200) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => JobTitlesPage()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed: ${response.data}")),
-        );
-      }
-    } catch (e) {
-      debugPrint("Error submitting details: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Something went wrong!")),
-      );
-    }
-
-    setState(() => isLoading = false);
   }
+
+  // Future<void> _submitPersonalDetails() async {
+  //   setState(() => isLoading = true);
+  //
+  //   try {
+  //     widget.registerData.addAll({
+  //       "full_name": widget.fullNameCtrl.text.trim(),
+  //       "email": widget.emailCtrl.text.trim(),
+  //       "phone": widget.phoneCtrl.text.trim(),
+  //       "current_city": widget.currentCityCtrl.text.trim(),
+  //       "current_state": widget.currentStateCtrl.text.trim(),
+  //       "agreed_terms": true,
+  //       "agreed_privacy": true,
+  //       "role_id": 2,
+  //       "password": widget.registerData["password"] ?? "12345678",
+  //       "resume_path": widget.resumeFile?.path.split("/").last ?? "",
+  //
+  //       // Make sure resume_json is sent as string
+  //       "resume_json": widget.registerData["resume_json"] != null
+  //           ? widget.registerData["resume_json"].toString()
+  //           : "{}",
+  //
+  //       "apply_for_jobs_in": widget.registerData["apply_for_jobs_in"] ?? "IT",
+  //       "prev_job_titles": widget.registerData["prev_job_titles"] ?? [],
+  //       "suggested_job_titles":
+  //       widget.registerData["suggested_job_titles"] ?? [],
+  //       "preferred_city_id": widget.registerData["preferred_city_id"] ?? 0,
+  //       "preferred_state_id": widget.registerData["preferred_state_id"] ?? 0,
+  //       "preferred_city": widget.registerData["preferred_city"] ?? "",
+  //       "preferred_state": widget.registerData["preferred_state"] ?? "",
+  //     });
+  //
+  //     var dio = Dio();
+  //     var response = await dio.post(
+  //       "https://apistaging.jobatize.com/register",
+  //       data: widget.registerData,
+  //       options: Options(
+  //         headers: {
+  //           "Authorization": "Bearer ${widget.token}",
+  //           "Content-Type": "application/json",
+  //         },
+  //       ),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => JobTitlesPage(
+  //             token: widget.token,
+  //             jobTitleCtrl: TextEditingController(),
+  //             registerData: widget.registerData,
+  //           ),
+  //         ),
+  //       );
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text("Failed: ${response.data}")),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error submitting details: $e");
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text("Something went wrong!")),
+  //     );
+  //   }
+  //
+  //   setState(() => isLoading = false);
+  // }
 
   bool get _isLoading => isLoading;
 
@@ -193,9 +261,13 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                     _buildTextField("Email Address", widget.emailCtrl),
                     _buildTextField("Phone Number", widget.phoneCtrl),
                     _buildTextField(
-                        "Current Location (Town/City)", widget.currentCityCtrl),
+                      "Current Location (Town/City)",
+                      widget.currentCityCtrl,
+                    ),
                     _buildTextField(
-                        "Current Location State", widget.currentStateCtrl),
+                      "Current Location State",
+                      widget.currentStateCtrl,
+                    ),
 
                     const SizedBox(height: 20),
 
@@ -207,7 +279,9 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -233,12 +307,15 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFF2563EB),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          onPressed: _submitPersonalDetails,
+                          // onPressed: _submitPersonalDetails,
+                          onPressed: _goToNextPage,
                           child: const Text(
                             "Next",
                             style: TextStyle(color: Colors.white),
@@ -282,6 +359,3 @@ class _PersonalDetailsState extends State<PersonalDetails> {
     );
   }
 }
-
-
-

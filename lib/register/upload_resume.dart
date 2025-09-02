@@ -50,7 +50,6 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo
               Container(
                 padding: const EdgeInsets.all(16),
                 alignment: Alignment.center,
@@ -94,7 +93,6 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Step 1 text
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(

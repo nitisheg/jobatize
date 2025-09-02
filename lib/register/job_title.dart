@@ -3,25 +3,34 @@ import 'package:jobatize_app/register/personal_details.dart';
 import 'package:jobatize_app/register/suggested_job_title.dart';
 
 class JobTitlesPage extends StatefulWidget {
-  const JobTitlesPage({super.key});
+  final Map<String, dynamic> registerData;
+
+  const JobTitlesPage({super.key, required this.registerData});
 
   @override
   State<JobTitlesPage> createState() => _JobTitlesPageState();
 }
 
 class _JobTitlesPageState extends State<JobTitlesPage> {
-  late TextEditingController jobController; // declare controller
-  List<String> jobTitles = ["Intern"];
+  late TextEditingController jobController;
+  late List<String> jobTitles;
 
   @override
   void initState() {
     super.initState();
     jobController = TextEditingController();
+
+    // ✅ Initialize jobTitles from registerData
+    jobTitles = List<String>.from(
+      widget.registerData["prev_job_titles"] ?? ["Intern"],
+    );
+
+    print("📋 Loaded jobTitles from API: $jobTitles");
   }
 
   @override
   void dispose() {
-    jobController.dispose(); // dispose controller to avoid memory leaks
+    jobController.dispose();
     super.dispose();
   }
 
@@ -29,10 +38,11 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
     if (jobController.text.trim().isNotEmpty) {
       setState(() {
         jobTitles.add(jobController.text.trim());
+        print("✅ Added job title: ${jobController.text.trim()}");
+        print("📋 Current jobTitles list: $jobTitles");
         jobController.clear();
       });
 
-      // Success Snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("Job title added successfully!"),
@@ -48,9 +58,10 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
   void _removeJobTitle(String title) {
     setState(() {
       jobTitles.remove(title);
+      print("❌ Removed job title: $title");
+      print("📋 Updated jobTitles list: $jobTitles");
     });
 
-    // Error Snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("$title removed"),
@@ -58,6 +69,18 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.only(top: 40, right: 20),
         dismissDirection: DismissDirection.up,
+      ),
+    );
+  }
+
+  void _goNext() {
+    // ✅ Save edited jobTitles back into registerData
+    final updatedData = {...widget.registerData, "prev_job_titles": jobTitles};
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SuggestedJobTitlesScreen(registerData: updatedData),
       ),
     );
   }
@@ -73,7 +96,6 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [],
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -123,7 +145,13 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
                 Column(
                   children: jobTitles.map((title) {
                     return ListTile(
-                      title: Text(title),
+                      title: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       trailing: TextButton(
                         onPressed: () => _removeJobTitle(title),
                         child: const Text(
@@ -169,42 +197,27 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // ElevatedButton(
-                    //   style: ElevatedButton.styleFrom(
-                    //     backgroundColor: Colors.white,
-                    //     padding: const EdgeInsets.symmetric(
-                    //       horizontal: 24,
-                    //       vertical: 12,
-                    //     ),
-                    //     shape: RoundedRectangleBorder(
-                    //       borderRadius: BorderRadius.circular(8),
-                    //     ),
-                    //   ),
-                    //   onPressed: () {
-                    //     if (Navigator.canPop(context)) {
-                    //       Navigator.pop(context);
-                    //     } else {
-                    //       // Handle case: maybe go to home or upload screen
-                    //       Navigator.pushReplacement(
-                    //         context,
-                    //         MaterialPageRoute(
-                    //           builder: (context) => PersonalDetails(
-                    //             token: '',
-                    //             fullNameCtrl: '',
-                    //             emailCtrl: '',
-                    //             phoneCtrl: '',
-                    //             currentCityCtrl: '',
-                    //             currentStateCtrl: '',
-                    //           ),
-                    //         ),
-                    //       );
-                    //     }
-                    //   },
-                    //   child: const Text(
-                    //     "Back",
-                    //     style: TextStyle(color: Colors.black),
-                    //   ),
-                    // ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (Navigator.canPop(context)) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text(
+                        "Back",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF2563EB),
@@ -217,12 +230,11 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SuggestedJobTitlesScreen(),
-                          ),
-                        );
+                        // ✅ Debug log before navigation
+                        print("➡️ Navigating to SuggestedJobTitlesScreen");
+                        print("📋 Final jobTitles: $jobTitles");
+
+                        _goNext();
                       },
                       child: const Text(
                         "Next",
