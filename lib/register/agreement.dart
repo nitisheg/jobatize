@@ -3,7 +3,9 @@ import 'package:jobatize_app/register/location_preferences.dart';
 import 'package:jobatize_app/register/set_password.dart';
 
 class AgreementScreen extends StatefulWidget {
-  const AgreementScreen({super.key, required Map<String, dynamic> registerData});
+  final Map<String, dynamic> registerData; // ✅ pass register data
+
+  const AgreementScreen({super.key, required this.registerData});
 
   @override
   State<AgreementScreen> createState() => _AgreementScreenState();
@@ -12,51 +14,6 @@ class AgreementScreen extends StatefulWidget {
 class _AgreementScreenState extends State<AgreementScreen> {
   bool termsAccepted = false;
   bool privacyAccepted = false;
-
-  void _showTopRightToast(String message, {bool success = true}) {
-    final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: 50,
-        right: 16,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: success ? Colors.green : Colors.red,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 6,
-                  offset: Offset(2, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  success ? Icons.check_circle : Icons.error,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(message, style: const TextStyle(color: Colors.white)),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(overlayEntry);
-
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,10 +78,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
                   radius: const Radius.circular(8),
                   thickness: 8,
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                      right: 8,
-                      left: 4,
-                    ), // 👈 space between content & scrollbar
+                    padding: const EdgeInsets.only(right: 8, left: 4),
                     child: SingleChildScrollView(
                       child: const Text(
                         """Job Buddie Terms and Conditions (Sample)\n
@@ -174,39 +128,41 @@ If you have questions about this privacy policy, please contact us at [Your Cont
                   ),
                 ),
               ),
-
               const SizedBox(height: 10),
               CheckboxListTile(
                 value: termsAccepted,
-                onChanged: (value) => setState(() => termsAccepted = value!),
-                controlAffinity:
-                    ListTileControlAffinity.leading, // Checkbox on left
+                onChanged: (value) {
+                  setState(() => termsAccepted = value!);
+                  print("✅ Terms Accepted: $termsAccepted");
+                },
+                controlAffinity: ListTileControlAffinity.leading,
                 visualDensity: const VisualDensity(
                   horizontal: -4,
                   vertical: -4,
-                ), // 👈 reduces space
-                contentPadding: EdgeInsets.zero, // removes extra padding
+                ),
+                contentPadding: EdgeInsets.zero,
                 title: const Text(
                   "I have read and agree to the Terms and Conditions",
                   style: TextStyle(fontSize: 14),
                 ),
               ),
-
               CheckboxListTile(
                 value: privacyAccepted,
-                onChanged: (value) => setState(() => privacyAccepted = value!),
+                onChanged: (value) {
+                  setState(() => privacyAccepted = value!);
+                  print("✅ Privacy Accepted: $privacyAccepted");
+                },
                 controlAffinity: ListTileControlAffinity.leading,
                 visualDensity: const VisualDensity(
                   horizontal: -4,
                   vertical: -4,
-                ), // 👈 reduces space
+                ),
                 contentPadding: EdgeInsets.zero,
                 title: const Text(
                   "I have read and agree to the Privacy Policy",
                   style: TextStyle(fontSize: 14),
                 ),
               ),
-
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -225,13 +181,6 @@ If you have questions about this privacy policy, please contact us at [Your Cont
                     onPressed: () {
                       if (Navigator.canPop(context)) {
                         Navigator.pop(context);
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LocationPreferencesPage(registerData: {},),
-                          ),
-                        );
                       }
                     },
                     child: const Text(
@@ -251,9 +200,34 @@ If you have questions about this privacy policy, please contact us at [Your Cont
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pushReplacement(
+                      // ✅ Validation
+                      if (!termsAccepted || !privacyAccepted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "You must agree to Terms and Privacy Policy to continue.",
+                            ),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      }
+
+                      // ✅ Store true values
+                      widget.registerData['agreed_terms'] = true;
+                      widget.registerData['agreed_privacy'] = true;
+
+                      debugPrint("📍 Location Data: ${widget.registerData}");
+
+                      Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SetPassword()),
+                        MaterialPageRoute(
+                          builder: (context) => SetPassword(
+                            registerData: widget.registerData,
+                            token: '',
+                          ),
+                        ),
                       );
                     },
                     child: const Text(

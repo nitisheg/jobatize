@@ -55,7 +55,7 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
     }
   }
 
-  // ✅ Load cities based on state_id
+  // Load cities based on state_id
   Future<void> _loadCities(String stateId) async {
     try {
       final response = await http.get(
@@ -90,7 +90,28 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
   }
 
   void _goNext() {
-    // ✅ Find selected state & city names
+    if (selectedStateId == null || selectedStateId!.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("⚠️ Please select a state")));
+      return;
+    }
+
+    if (selectedCityId == null || selectedCityId!.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("⚠️ Please select a city")));
+      return;
+    }
+
+    if (jobPreference == null || jobPreference!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("⚠️ Please select a job preference")),
+      );
+      return;
+    }
+
+    // Find selected state & city names
     final selectedState = states.firstWhere(
       (state) => state["id"] == selectedStateId,
       orElse: () => {},
@@ -100,7 +121,7 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
       orElse: () => {},
     );
 
-    // ✅ Save to registerData
+    // Save to registerData
     widget.registerData["preferred_state_id"] = selectedStateId ?? "";
     widget.registerData["preferred_state_name"] = selectedState["name"] ?? "";
     widget.registerData["preferred_city_id"] = selectedCityId ?? "";
@@ -109,7 +130,7 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
 
     debugPrint("📍 Location Data: ${widget.registerData}");
 
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>

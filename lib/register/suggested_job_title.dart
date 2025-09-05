@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'location_preferences.dart';
 
@@ -22,7 +24,7 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
         jobTitles.add({
           "title": _titleController.text.trim(),
           "desc": "Manually added title.",
-          "selected": false,
+          "selected": true,
         });
         _titleController.clear();
       });
@@ -52,6 +54,8 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
       ),
     ];
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -208,20 +212,32 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                         ),
                       ),
                       onPressed: () {
+                        // ✅ build object list instead of plain strings
                         final suggestedJobTitles = jobTitles
-                            .where((job) => job["suggested_job_titles"] == true)
+                            .where((job) => job["selected"] == true)
                             .map(
-                              (job) => job["suggested_job_titles"].toString(),
+                              (job) => {
+                                "title": job["title"].toString(),
+                                "relevance_reason": job["relevance_reason"]
+                                    .toString(),
+                              },
                             )
                             .toList();
 
-                        widget.registerData["suggested_job_titles"] =
-                            suggestedJobTitles;
-                        debugPrint(
-                          "Final selected jobTitles: $suggestedJobTitles",
+                        // ✅ encode as JSON string (what API expects)
+                        final suggestedJobTitlesJson = jsonEncode(
+                          suggestedJobTitles,
                         );
 
-                        Navigator.pushReplacement(
+                        // save in registerData
+                        widget.registerData["suggested_job_titles"] =
+                            suggestedJobTitlesJson;
+
+                        debugPrint(
+                          "📤 Final suggested_job_titles: $suggestedJobTitlesJson",
+                        );
+
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => LocationPreferencesPage(
@@ -230,6 +246,7 @@ class _SuggestedJobTitlesScreenState extends State<SuggestedJobTitlesScreen> {
                           ),
                         );
                       },
+
                       child: const Text(
                         "Next",
                         style: TextStyle(color: Colors.white),

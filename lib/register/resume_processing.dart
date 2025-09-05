@@ -30,9 +30,6 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
         Uri.parse('https://apistaging.jobatize.com/parse_cv/'),
       );
 
-      request.headers['Authorization'] =
-          'IYIPy4728BDS8CIqQLmIqbL1kANdinIU0jH2bbOj41BzBaAWD0GDr44gL9AxJQySlrx2FXufgHQW7kjS92oiGsmBuVnAvq8XWh2KrP5Bbd2cMf8L4FmFtcfFAtgKGcrE';
-
       request.files.add(
         await http.MultipartFile.fromPath('file', widget.cvFile.path),
       );
@@ -45,14 +42,14 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
       print("📥 Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        // 🔄 Double decode (because API returns JSON as string)
+        // Double decode (because API returns JSON as string)
         final firstDecode = json.decode(response.body);
         final data = firstDecode is String
             ? json.decode(firstDecode)
             : firstDecode;
 
         final personalInfo = data['personal_information'] ?? {};
-        final fullName = personalInfo['name'] ?? "John Doe";
+        final fullName = personalInfo['name'] ?? "YYY ZZZ";
         final emailCtrl = personalInfo['email'] ?? "johndoe@email.com";
         final phoneCtrl = personalInfo['phone'] ?? "9999999999";
         final location = personalInfo['location'] ?? "New Delhi, Delhi";
@@ -77,27 +74,30 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
             .where((title) => title.isNotEmpty)
             .toList();
 
-        print("📝 Extracted Job Titles: $suggestedJobTitles");
+        setState(() {
+          _isLoading = false;
+        });
+        print("✅ CV processed successfully.");
 
-
-
-
+        print("📝 Extracted Suggested Job Titles: $suggestedJobTitles");
+        print("📝 Extracted Suggested Job Titles: ${widget.cvFile.path}");
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (_) => PersonalDetails(
-              token:
-                  '0GRZWIUy1pPH3Y7RoLHtEOSRCRMQufOVD0Sh3RuDZnymcaSrX0eI4N6KFGYoyIDN4wRvGX5mEQ16w1M99WO8NXddEQMmXIjaA0MZzS3MQBYkZtFnhPymgNkPN0FAgv75',
-
+              token: "",
               fullNameCtrl: TextEditingController(text: fullName),
               emailCtrl: TextEditingController(text: emailCtrl),
               phoneCtrl: TextEditingController(text: phoneCtrl),
               currentCityCtrl: TextEditingController(text: currentCityCtrl),
-              currentStateCtrl: TextEditingController(text: currentStateCtrl),  registerData: {
-              "prev_job_titles": prevJobTitles,
-              "suggestedJobTitles": suggestedJobTitles,
-            },
+              currentStateCtrl: TextEditingController(text: currentStateCtrl),
+              registerData: {
+                "resume_path": widget.cvFile.path, // ✅ CV path
+                "resume_json": json.encode(data),  // ✅ Full resume JSON as String
+                "prev_job_titles": prevJobTitles,
+                "suggested_job_titles": suggestedJobTitles,
+              },
             ),
           ),
         );

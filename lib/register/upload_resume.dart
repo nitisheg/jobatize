@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:jobatize_app/register/resume_processing.dart';
+import '../login/login_view.dart';
+import 'package:flutter/gestures.dart';
 
 class ResumeUploadScreen extends StatefulWidget {
   const ResumeUploadScreen({super.key});
@@ -143,14 +145,19 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
                     TextSpan(
                       text: "Sign in",
                       style: const TextStyle(
-                        color: Colors.blue, // usually make it look like a link
+                        color: Colors.blue, // looks like a link
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
-                      // recognizer: TapGestureRecognizer()
-                      //   ..onTap = () {
-                      //
-                      //   },
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LoginView(),
+                            ),
+                          );
+                        },
                     ),
                   ],
                 ),

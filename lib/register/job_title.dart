@@ -24,8 +24,6 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
     jobTitles = List<String>.from(
       widget.registerData["prev_job_titles"] ?? ["Intern"],
     );
-
-    print("📋 Loaded jobTitles from API: $jobTitles");
   }
 
   @override
@@ -38,8 +36,6 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
     if (jobController.text.trim().isNotEmpty) {
       setState(() {
         jobTitles.add(jobController.text.trim());
-        print("✅ Added job title: ${jobController.text.trim()}");
-        print("📋 Current jobTitles list: $jobTitles");
         jobController.clear();
       });
 
@@ -58,8 +54,6 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
   void _removeJobTitle(String title) {
     setState(() {
       jobTitles.remove(title);
-      print("❌ Removed job title: $title");
-      print("📋 Updated jobTitles list: $jobTitles");
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -74,6 +68,20 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
   }
 
   void _goNext() {
+    // ✅ Validation: must have at least 1 job title
+    if (jobTitles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please add at least one job title before proceeding."),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.only(top: 40, right: 20),
+          dismissDirection: DismissDirection.up,
+        ),
+      );
+      return;
+    }
+
     // ✅ Save edited jobTitles back into registerData
     final updatedData = {...widget.registerData, "prev_job_titles": jobTitles};
 
@@ -229,13 +237,7 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: () {
-                        // ✅ Debug log before navigation
-                        print("➡️ Navigating to SuggestedJobTitlesScreen");
-                        print("📋 Final jobTitles: $jobTitles");
-
-                        _goNext();
-                      },
+                      onPressed: _goNext,
                       child: const Text(
                         "Next",
                         style: TextStyle(color: Colors.white),

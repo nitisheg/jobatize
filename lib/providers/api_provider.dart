@@ -24,8 +24,6 @@ class RegisterProvider extends ChangeNotifier {
   final currentStateCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
 
-
-
   bool agreedTerms = false;
   bool agreedPrivacy = false;
   int preferredCityId = 0;
