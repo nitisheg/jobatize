@@ -52,7 +52,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       var dio = Dio();
       var formData = FormData.fromMap({
         "resume": await MultipartFile.fromFile(file.path),
-        "resume_path": file.path,
+        "file_path": file.path,  // changed here
       });
 
       var response = await dio.post(
@@ -127,10 +127,8 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       "agreed_privacy": true,
       "role_id": 2,
       "password": widget.registerData["password"] ?? "12345678",
-      "resume_file_name": widget.resumeFile != null
-          ? widget.resumeFile!.path.split("/").last
-          : "",
-      "resume_path": widget.resumeFile?.path ?? "",
+      "file_path": widget.registerData['file_path'] ?? "", // ✅ take file_path from API response
+
       "resume_json": widget.registerData["resume_json"] ?? "{}",
       "apply_for_jobs_in": widget.registerData["apply_for_jobs_in"] ?? "IT",
       "prev_job_titles": widget.registerData["prev_job_titles"] ?? [],

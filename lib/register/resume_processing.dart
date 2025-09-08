@@ -47,7 +47,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
         final data = firstDecode is String
             ? json.decode(firstDecode)
             : firstDecode;
-
+        print("📥 Response resume_path: ${data['file_path']}");
         final personalInfo = data['personal_information'] ?? {};
         final fullName = personalInfo['name'] ?? "YYY ZZZ";
         final emailCtrl = personalInfo['email'] ?? "johndoe@email.com";
@@ -80,7 +80,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
         print("✅ CV processed successfully.");
 
         print("📝 Extracted Suggested Job Titles: $suggestedJobTitles");
-        print("📝 Extracted Suggested Job Titles: ${widget.cvFile.path}");
+        print("📝 CV : ${widget.cvFile.path}");
 
         Navigator.pushReplacement(
           context,
@@ -93,8 +93,12 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
               currentCityCtrl: TextEditingController(text: currentCityCtrl),
               currentStateCtrl: TextEditingController(text: currentStateCtrl),
               registerData: {
-                "resume_path": widget.cvFile.path, // ✅ CV path
-                "resume_json": json.encode(data),  // ✅ Full resume JSON as String
+                "file_path":
+                    data['file_path'] ??
+                    "", // ✅ take file_path from API response
+                "resume_json": json.encode(
+                  data,
+                ), // ✅ Full resume JSON as String
                 "prev_job_titles": prevJobTitles,
                 "suggested_job_titles": suggestedJobTitles,
               },

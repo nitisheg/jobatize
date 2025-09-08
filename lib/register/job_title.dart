@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jobatize_app/register/personal_details.dart';
 import 'package:jobatize_app/register/suggested_job_title.dart';
 
 class JobTitlesPage extends StatefulWidget {
