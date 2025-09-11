@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jobatize_app/register/location_preferences.dart';
-import 'package:jobatize_app/register/set_password.dart';
+import 'package:jobatize_app/view/register/set_password.dart';
 
 class AgreementScreen extends StatefulWidget {
   final Map<String, dynamic> registerData; // ✅ pass register data
@@ -200,7 +199,6 @@ If you have questions about this privacy policy, please contact us at [Your Cont
                       ),
                     ),
                     onPressed: () {
-                      // ✅ Validation
                       if (!termsAccepted || !privacyAccepted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -213,8 +211,6 @@ If you have questions about this privacy policy, please contact us at [Your Cont
                         );
                         return;
                       }
-
-                      // ✅ Store true values
                       widget.registerData['agreed_terms'] = true;
                       widget.registerData['agreed_privacy'] = true;
 

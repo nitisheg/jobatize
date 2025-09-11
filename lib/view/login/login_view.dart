@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:dio/dio.dart';
-import 'package:jobatize_app/register/upload_resume.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../home_page/home_page_view.dart';
+import '../register/upload_resume.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -46,19 +46,31 @@ class _LoginViewState extends State<LoginView> {
       setState(() => _isLoading = false);
 
       if (response.statusCode == 200 && response.data != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Login successful!"),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 2),
-          ),
-        );
+        String? accessToken = response.data['access_token'];
+        String? refreshToken = response.data['refresh_token'];
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePageView()),
-        );
+        if (accessToken != null && refreshToken != null) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('authToken', accessToken);
+          await prefs.setString('refreshToken', refreshToken);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Login successful!"),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.fixed,
+              duration: Duration(seconds: 2),
+            ),
+          );
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePageView()),
+            (Route<dynamic> route) => false,
+          );
+        } else {
+          _showError("Login failed: Missing tokens");
+        }
       } else {
         _showError("Login failed: ${response.statusMessage}");
       }
@@ -104,7 +116,6 @@ class _LoginViewState extends State<LoginView> {
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 20),
-
               Container(
                 width: 350,
                 padding: const EdgeInsets.all(20),
@@ -132,8 +143,6 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
                       const SizedBox(height: 24),
-
-                      /// Email field
                       TextFormField(
                         controller: emailCtrl,
                         decoration: const InputDecoration(
@@ -151,8 +160,6 @@ class _LoginViewState extends State<LoginView> {
                         },
                       ),
                       const SizedBox(height: 16),
-
-                      /// Password field
                       TextFormField(
                         controller: passwordCtrl,
                         decoration: const InputDecoration(
@@ -165,8 +172,6 @@ class _LoginViewState extends State<LoginView> {
                             : null,
                       ),
                       const SizedBox(height: 24),
-
-                      /// Login button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -192,10 +197,7 @@ class _LoginViewState extends State<LoginView> {
                                 ),
                         ),
                       ),
-
                       const SizedBox(height: 20),
-
-                      /// Register link
                       RichText(
                         text: TextSpan(
                           style: const TextStyle(
@@ -213,7 +215,7 @@ class _LoginViewState extends State<LoginView> {
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>

@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:jobatize_app/register/job_title.dart';
-import 'package:jobatize_app/register/upload_resume.dart';
+import 'package:jobatize_app/view/register/upload_resume.dart';
+
+import 'job_title.dart';
 
 class PersonalDetails extends StatefulWidget {
   final File? resumeFile;
@@ -86,35 +87,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
     setState(() => isLoading = false);
   }
 
-  /// ------------------ API: Submit Personal Details ------------------
-  // Future<void> _goToNextPage() async {
-  //   widget.registerData.addAll({
-  //     "full_name": widget.fullNameCtrl.text.trim(),
-  //     "email": widget.emailCtrl.text.trim(),
-  //     "phone": widget.phoneCtrl.text.trim(),
-  //     "current_city": widget.currentCityCtrl.text.trim(),
-  //     "current_state": widget.currentStateCtrl.text.trim(),
-  //     "agreed_terms": true,
-  //     "agreed_privacy": true,
-  //     "role_id": 2,
-  //     "password": widget.registerData["password"] ?? "12345678",
-  //     "resume_json": widget.registerData["resume_json"] ?? "{}",
-  //     "apply_for_jobs_in": widget.registerData["apply_for_jobs_in"] ?? "IT",
-  //     "prev_job_titles": widget.registerData["prev_job_titles"] ?? [],
-  //     "suggested_job_titles": widget.registerData["suggested_job_titles"] ?? [],
-  //     "preferred_city_id": widget.registerData["preferred_city_id"] ?? 0,
-  //     "preferred_state_id": widget.registerData["preferred_state_id"] ?? 0,
-  //     "preferred_city": widget.registerData["preferred_city"] ?? "",
-  //     "preferred_state": widget.registerData["preferred_state"] ?? "",
-  //   });
-  //   print("📋 registerData remains unchanged: ${widget.registerData}");
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => JobTitlesPage(registerData: widget.registerData),
-  //     ),
-  //   );
-  // }
+
 
   Future<void> _goToNextPage() async {
     widget.registerData.addAll({

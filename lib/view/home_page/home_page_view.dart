@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:jobatize_app/login/login_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../login/login_view.dart';
+import '../menu_items/go_social_and_earn.dart';
+import '../menu_items/personal_details_edit.dart';
+import '../menu_items/potential_job_matches.dart';
+import '../menu_items/resume_improvement.dart';
+import '../menu_items/upload_new_resume.dart';
+import '../menu_items/view_application_sent.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -9,7 +16,6 @@ class HomePageView extends StatefulWidget {
 }
 
 class _HomePageViewState extends State<HomePageView> {
-  String _selectedMenu = "Potential Job Matches";
   final List<String> menuItems = [
     "Upload New Resume",
     "Resume Improvement",
@@ -18,9 +24,38 @@ class _HomePageViewState extends State<HomePageView> {
     "Personal Details",
     "Go Social & Earn",
   ];
+
+  Widget _getScreen(String item) {
+    switch (item) {
+      case "Upload New Resume":
+        return const UploadNewResume();
+      case "Resume Improvement":
+        return const ResumeImprovement();
+      case "View Applications Sent":
+        return const ViewApplicationSent();
+      case "Potential Job Matches":
+        return const PotentialJobs();
+      case "Personal Details":
+        return const PersonalDetailsEdit();
+      case "Go Social & Earn":
+        return const GoSocial();
+      default:
+        return const HomePageView();
+    }
+  }
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('authToken');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginView()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFFF),
         title: Row(
@@ -37,16 +72,12 @@ class _HomePageViewState extends State<HomePageView> {
             ),
           ),
           IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginView()),
-              );
-            },
+            onPressed: _logout,
             icon: const Icon(Icons.logout, color: Colors.red),
           ),
         ],
       ),
+
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -61,51 +92,19 @@ class _HomePageViewState extends State<HomePageView> {
             ...menuItems.map((item) {
               return ListTile(
                 title: Text(item),
-                selected: _selectedMenu == item,
-                selectedTileColor: Colors.blue.shade100,
                 onTap: () {
-                  setState(() {
-                    _selectedMenu = item;
-                  });
                   Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => _getScreen(item)),
+                  );
                 },
               );
             }),
           ],
         ),
       ),
-
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _selectedMenu,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _selectedMenu == "Potential Job Matches"
-                      ? "Here are some job opportunities that match your skills and preferences."
-                      : "Content for $_selectedMenu will appear here.",
-                  style: const TextStyle(color: Colors.black54),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      body: const PotentialJobs(),
     );
   }
 }

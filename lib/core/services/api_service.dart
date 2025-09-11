@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../core/model/register_request.dart';
-import '../core/model/resume_upload_response.dart';
-
+import '../model/job_view_model.dart';
+import '../model/register_request.dart';
+import '../model/resume_upload_response.dart';
 
 class ApiService {
   static const String baseUrl = "https://apistaging.jobatize.com";
@@ -60,5 +60,35 @@ class ApiService {
 
   void dispose() {
     _client.close();
+  }
+
+  Future<List<Job>> fetchJobs(String candidateId) async {
+    final url = Uri.parse("$baseUrl/candidate/$candidateId");
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final jobs = (data['jobs'] as List?) ?? [];
+      return jobs.map((e) => Job.fromJson(e)).toList();
+    } else {
+      throw Exception("Failed to fetch jobs");
+    }
+  }
+
+  Future<bool> applyJob(String jobId, String jobUrl, String jobTitle) async {
+    final url = Uri.parse("$baseUrl/candidate/apply-job");
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: json.encode({
+        "job_id": jobId,
+        "job_url": jobUrl,
+        "job_title": jobTitle,
+      }),
+    );
+
+    return response.statusCode == 200;
   }
 }

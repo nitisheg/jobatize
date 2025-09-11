@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:jobatize_app/register/resume_processing.dart';
+import 'package:jobatize_app/view/register/resume_processing.dart';
 import '../login/login_view.dart';
 import 'package:flutter/gestures.dart';
 

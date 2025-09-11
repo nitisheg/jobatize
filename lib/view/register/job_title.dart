@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jobatize_app/register/suggested_job_title.dart';
+import 'package:jobatize_app/view/register/suggested_job_title.dart';
 
 class JobTitlesPage extends StatefulWidget {
   final Map<String, dynamic> registerData;

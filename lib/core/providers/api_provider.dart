@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../core/model/register_request.dart';
-import '../core/model/resume_upload_response.dart';
+import '../model/register_request.dart';
+import '../model/resume_upload_response.dart';
 import '../services/api_service.dart';
 
 class RegisterProvider extends ChangeNotifier {

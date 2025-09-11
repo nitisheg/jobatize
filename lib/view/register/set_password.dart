@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:jobatize_app/home_page/home_page_view.dart';
-import 'job_title.dart';
+import '../home_page/home_page_view.dart';
 
 class SetPassword extends StatefulWidget {
   final Map<String, dynamic> registerData;

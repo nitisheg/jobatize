@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:jobatize_app/register/personal_details.dart';
+import 'package:jobatize_app/view/register/personal_details.dart';
 
 class ProcessingScreen extends StatefulWidget {
   final File cvFile;
@@ -95,10 +95,10 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
               registerData: {
                 "file_path":
                     data['file_path'] ??
-                    "", // ✅ take file_path from API response
+                    "",
                 "resume_json": json.encode(
                   data,
-                ), // ✅ Full resume JSON as String
+                ),
                 "prev_job_titles": prevJobTitles,
                 "suggested_job_titles": suggestedJobTitles,
               },

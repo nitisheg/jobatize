@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jobatize_app/register/agreement.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'agreement.dart';
 
 class LocationPreferencesPage extends StatefulWidget {
   final Map<String, dynamic> registerData;
@@ -27,7 +28,6 @@ class _LocationPreferencesPageState extends State<LocationPreferencesPage> {
     _loadStates();
   }
 
-  // ✅ Load states
   Future<void> _loadStates() async {
     try {
       final response = await http.get(
