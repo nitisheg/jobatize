@@ -7,6 +7,7 @@ import '../menu_items/potential_job_matches.dart';
 import '../menu_items/resume_improvement.dart';
 import '../menu_items/upload_new_resume.dart';
 import '../menu_items/view_application_sent.dart';
+import 'dashboard_view.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -43,6 +44,7 @@ class _HomePageViewState extends State<HomePageView> {
         return const HomePageView();
     }
   }
+
   Future<void> _logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('authToken');
@@ -104,7 +106,7 @@ class _HomePageViewState extends State<HomePageView> {
           ],
         ),
       ),
-      body: const PotentialJobs(),
+      body: const DashboardView(),
     );
   }
 }

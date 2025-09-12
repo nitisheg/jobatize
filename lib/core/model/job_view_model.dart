@@ -2,19 +2,21 @@ class Job {
   final String id;
   final String title;
   final String company;
-  final String datePosted;
-  final String ctc;
+  final String pubDate;
+  final String cpc;
   final String description;
   final String jobUrl;
+  final String companyLogo;
 
   Job({
     required this.id,
     required this.title,
     required this.company,
-    required this.datePosted,
-    required this.ctc,
+    required this.pubDate,
+    required this.cpc,
     required this.description,
     required this.jobUrl,
+    required this.companyLogo,
   });
 
   factory Job.fromJson(Map<String, dynamic> json) {
@@ -22,10 +24,11 @@ class Job {
       id: json['id'].toString(),
       title: json['title'] ?? '',
       company: json['company'] ?? '',
-      datePosted: json['posted_on'] ?? '',
-      ctc: json['ctc']?.toString() ?? '',
+      pubDate: json['pub_date'] ?? '',
+      cpc: json['cpc']?.toString() ?? '',
       description: json['description'] ?? '',
       jobUrl: json['job_url'] ?? '',
+      companyLogo: json['company_logo'] ?? '',
     );
   }
 }

@@ -1,50 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
+import '../../core/model/job_view_model.dart';
+import '../../core/services/api_service.dart';
 
-class PotentialJobs extends StatelessWidget {
+class PotentialJobs extends StatefulWidget {
   const PotentialJobs({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, String>> jobs = [
-      {
-        "title": "Senior Accountant",
-        "company": "Infosys (Hybrid)",
-        "date": "31/08/2025",
-        "ctc": "160.1",
-        "description":
-            "A senior staff accountant’s responsibilities include the necessity to properly document the financial position of the company and work with all data to occasionally information from subsidiary income or expense modules.",
-      },
-      {
-        "title": "Complex Accountant - Account Receivable",
-        "company": "UXDLAB Technologies Pvt. Ltd. (Remote)",
-        "date": "07/09/2025",
-        "ctc": "115.2",
-        "description":
-            "Compensation Type: Hourly. Highgate Hotels: Highgate is a premier real estate investment and hospitality management company widely recognized as an innovator in the industry.",
-      },
-      {
-        "title": "Senior Accountant",
-        "company": "EGLOGICS (Remote)",
-        "date": "09/09/2025",
-        "ctc": "120.0",
-        "description":
-            "A senior staff accountant’s responsibilities include documenting financial positions and working with stakeholders across reporting modules.",
-      },
-    ];
+  State<PotentialJobs> createState() => _PotentialJobsState();
+}
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("46 Jobs Found"),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(12),
-        itemCount: jobs.length,
-        itemBuilder: (context, index) {
-          final job = jobs[index];
-          return Card(
+class _PotentialJobsState extends State<PotentialJobs> {
+  final ApiService apiService = ApiService();
+  late Future<List<Job>> _jobsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadJobs();
+  }
+
+  void _loadJobs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    setState(() {
+      _jobsFuture = apiService.fetchJobs(token);
+    });
+  }
+
+  Widget _buildShimmerList() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(12),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.blue.shade100,
+          child: Card(
             color: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -52,143 +46,319 @@ class PotentialJobs extends StatelessWidget {
             elevation: 3,
             margin: const EdgeInsets.symmetric(vertical: 8),
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.grey.shade200,
-                        backgroundImage: const AssetImage(
-                          "assets/images/X.png",
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          job["title"]!,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: Container(height: 16, color: Colors.grey),
                       ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          minimumSize: const Size(50, 28),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: const Text(
-                          "Apply",
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ),
+                      const SizedBox(width: 8),
+                      Container(width: 60, height: 36, color: Colors.grey),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  Container(height: 12, color: Colors.grey),
+                  const SizedBox(height: 8),
+                  Container(height: 12, color: Colors.grey),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      job["company"]!,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    width: double.infinity,
+                    height: 12,
+                    color: Colors.grey,
                   ),
                   const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: "Posted on: ",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
-                            ),
-                            TextSpan(
-                              text: job["date"],
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: "CTC: ",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
-                            ),
-                            TextSpan(
-                              text: job["ctc"],
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  Container(
+                    width: double.infinity,
+                    height: 12,
+                    color: Colors.grey,
                   ),
-                  const SizedBox(height: 8),
-                  RichText(
-                    text: TextSpan(
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: FutureBuilder<List<Job>>(
+        future: _jobsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            print("⏳ Loading jobs...");
+            return Column(
+              children: [
+                AppBar(
+                  title: const Text("Jobs Found"),
+                  centerTitle: true,
+                  backgroundColor: Colors.white,
+                ),
+                Expanded(child: _buildShimmerList()),
+              ],
+            );
+          }
+
+          if (snapshot.hasError) {
+            print("❌ Error fetching jobs: ${snapshot.error}");
+            return Column(
+              children: [
+                AppBar(
+                  title: const Text("Error"),
+                  centerTitle: true,
+                  backgroundColor: Colors.white,
+                ),
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const TextSpan(
-                          text: "Description: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            fontSize: 13,
+                        const Text(
+                          "❌ Failed to fetch jobs.",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _loadJobs,
+                          child: const Text("Retry"),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            print("⚠️ No jobs found");
+            return Column(
+              children: [
+                AppBar(
+                  title: const Text("0 Jobs Found"),
+                  centerTitle: true,
+                  backgroundColor: Colors.white,
+                ),
+                const Expanded(child: Center(child: Text("⚠️ No jobs found"))),
+              ],
+            );
+          }
+
+          final jobs = snapshot.data!;
+          print("✅ Loaded ${jobs.length} jobs");
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text("${jobs.length} Jobs Found"),
+              centerTitle: true,
+              backgroundColor: Colors.white,
+            ),
+            body: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: jobs.length,
+              itemBuilder: (context, index) {
+                final job = jobs[index];
+                return Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                  width: 1,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  job.companyLogo ?? "",
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(
+                                        Icons.business,
+                                        size: 28,
+                                        color: Colors.black54,
+                                      ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                job.title,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                final candidateId =
+                                    prefs.getString('candidateId') ?? "";
+
+                                final success = await apiService.applyJob(
+                                  candidateId,
+                                  job.id,
+                                  job.jobUrl ?? "",
+                                  job.title,
+                                );
+
+                                if (!mounted) return;
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      success
+                                          ? "✅ Applied successfully!"
+                                          : "❌ Failed to apply.",
+                                    ),
+                                    backgroundColor: success
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                "Apply",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            job.company,
+                            style: const TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
-                        TextSpan(
-                          text: job["description"],
-                          style: const TextStyle(
-                            color: Colors.black87,
-                            fontSize: 13,
+                        const SizedBox(height: 8),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Posted on: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "${job.pubDate}   ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey.shade600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "CTC: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              TextSpan(
+                                text: job.cpc,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey.shade600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        RichText(
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Description: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              TextSpan(
+                                text: job.description,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey.shade800,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
+                );
+              },
             ),
           );
         },

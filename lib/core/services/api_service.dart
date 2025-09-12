@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as _dio;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../model/candidate_model.dart';
 import '../model/job_view_model.dart';
 import '../model/register_request.dart';
 import '../model/resume_upload_response.dart';
@@ -62,33 +65,129 @@ class ApiService {
     _client.close();
   }
 
-  Future<List<Job>> fetchJobs(String candidateId) async {
-    final url = Uri.parse("$baseUrl/candidate/$candidateId");
 
-    final response = await http.get(url);
+  Future<Candidate> fetchCandidateDetails(String candidateId, String token) async {
+    final url = Uri.parse("$baseUrl/candidate/{$candidateId}");
+    print("📡 Fetching candidate details from → $url");
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final jobs = (data['jobs'] as List?) ?? [];
-      return jobs.map((e) => Job.fromJson(e)).toList();
-    } else {
-      throw Exception("Failed to fetch jobs");
+    try {
+      final response = await _client.get(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+
+      print("✅ Response Status: ${response.statusCode}");
+      print("📦 Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return Candidate.fromJson(data);
+      } else {
+        throw Exception("❌ Failed to load candidate details: ${response.body}");
+      }
+    } catch (e) {
+      print("🔥 Error while fetching candidate details: $e");
+      rethrow;
     }
   }
 
-  Future<bool> applyJob(String jobId, String jobUrl, String jobTitle) async {
+
+
+
+
+
+  /// Fetch Jobs
+  Future<List<Job>> fetchJobs(String token) async {
+    final url = Uri.parse("$baseUrl/candidate/jobs");
+    print("📡 Fetching jobs from → $url");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: json.encode({
+          "job_titles": ["Video Production Assistant", "driver"],
+          "city_name": "New York",
+          "state_name": "New York",
+          "apply_for_jobs_in": "local",
+          "limit": 100,
+        }),
+      );
+
+      print("✅ Response Status: ${response.statusCode}");
+      print("📦 Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data["jobs"] == null || data["jobs"] is! List) {
+          print("⚠️ No jobs found or invalid response format.");
+          return [];
+        }
+
+        final jobs = (data["jobs"] as List)
+            .map((job) => Job.fromJson(job))
+            .toList();
+
+        print("🎯 Jobs Fetched: ${jobs.length}");
+        return jobs;
+      } else {
+        throw Exception(
+          "❌ Failed to fetch jobs. Status: ${response.statusCode}",
+        );
+      }
+    } catch (e) {
+      print("🔥 Error while fetching jobs: $e");
+      rethrow;
+    }
+  }
+
+  /// Apply to Job
+  Future<bool> applyJob(
+    String candidateId,
+    String jobId,
+    String jobUrl,
+    String jobTitle,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken') ?? '';
+
     final url = Uri.parse("$baseUrl/candidate/apply-job");
+    print("📡 Applying to job → $url");
+    print("📡 token → $token");
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: json.encode({
-        "job_id": jobId,
-        "job_url": jobUrl,
-        "job_title": jobTitle,
-      }),
-    );
+    try {
+      final response = await _client.post(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "job_id": jobId,
+          "job_url": jobUrl,
+          "job_title": jobTitle,
+        }),
+      );
 
-    return response.statusCode == 200;
+      print("✅ Response Status: ${response.statusCode}");
+      print("📦 Response Body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        print("❌ Failed to apply for job. Status: ${response.statusCode}");
+        return false;
+      }
+    } catch (e) {
+      print("🔥 Error while applying for job: $e");
+      return false;
+    }
   }
 }
