@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
 import 'dart:convert';
-import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -117,7 +117,7 @@ class _ProfileViewState extends State<ProfileView> {
         final filePath = "${dir.path}/resume.pdf";
         final file = File(filePath);
         await file.writeAsBytes(bytes);
-        await OpenFilex.open(filePath);
+        await OpenFile.open(filePath);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
