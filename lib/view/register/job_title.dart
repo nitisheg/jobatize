@@ -147,8 +147,6 @@ class _JobTitlesPageState extends State<JobTitlesPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Job Titles List
                 Column(
                   children: jobTitles.map((title) {
                     return ListTile(

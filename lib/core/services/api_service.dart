@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart' as _dio;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/candidate_model.dart';
 import '../model/job_view_model.dart';
@@ -65,9 +65,10 @@ class ApiService {
     _client.close();
   }
 
-
-  Future<Candidate> fetchCandidateDetails(String candidateId, String token) async {
-    final url = Uri.parse("$baseUrl/candidate/{$candidateId}");
+  Future<Candidate> fetchCandidateDetails(
+    String token,
+  ) async {
+    final url = Uri.parse("$baseUrl/candidate");
     print("📡 Fetching candidate details from → $url");
 
     try {
@@ -93,11 +94,6 @@ class ApiService {
       rethrow;
     }
   }
-
-
-
-
-
 
   /// Fetch Jobs
   Future<List<Job>> fetchJobs(String token) async {
@@ -149,12 +145,11 @@ class ApiService {
   }
 
   /// Apply to Job
-  Future<bool> applyJob(
-    String candidateId,
-    String jobId,
-    String jobUrl,
-    String jobTitle,
-  ) async {
+  Future<bool> applyJob({
+    required String jobId,
+    required String jobUrl,
+    required String jobTitle,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken') ?? '';
 
@@ -190,4 +185,41 @@ class ApiService {
       return false;
     }
   }
+
+  Future<void> handleApply({
+    required BuildContext context,
+    required ApiService apiService,
+    required Job job,
+    required VoidCallback onSuccess,
+  }) async {
+    final success = await apiService.applyJob(
+      jobId: job.id,
+      jobUrl: job.jobUrl ?? "",
+      jobTitle: job.title,
+    );
+
+    if (success) {
+      onSuccess();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("✅ Applied successfully!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("❌ Failed to apply."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+
+
 }

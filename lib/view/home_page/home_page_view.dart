@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jobatize_app/view/menu_items/change_password.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../applied_jobs/applied_jobs_view.dart';
 import '../login/login_view.dart';
 import '../menu_items/go_social_and_earn.dart';
 import '../menu_items/personal_details_edit.dart';
@@ -7,7 +9,7 @@ import '../menu_items/potential_job_matches.dart';
 import '../menu_items/resume_improvement.dart';
 import '../menu_items/upload_new_resume.dart';
 import '../menu_items/view_application_sent.dart';
-import 'dashboard_view.dart';
+import '../menu_items/dashboard_view.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -18,16 +20,22 @@ class HomePageView extends StatefulWidget {
 
 class _HomePageViewState extends State<HomePageView> {
   final List<String> menuItems = [
+    "Dashboard",
     "Upload New Resume",
     "Resume Improvement",
     "View Applications Sent",
     "Potential Job Matches",
+    "Applied Jobs", // ✅ Added new section
     "Personal Details",
     "Go Social & Earn",
+    "Change Password",
+    "Logout",
   ];
 
   Widget _getScreen(String item) {
     switch (item) {
+      case "Dashboard":
+        return const DashboardView();
       case "Upload New Resume":
         return const UploadNewResume();
       case "Resume Improvement":
@@ -36,10 +44,14 @@ class _HomePageViewState extends State<HomePageView> {
         return const ViewApplicationSent();
       case "Potential Job Matches":
         return const PotentialJobs();
+      case "Applied Jobs": // ✅ Route to new screen
+        return const AppliedJobsView();
       case "Personal Details":
         return const PersonalDetailsEdit();
       case "Go Social & Earn":
         return const GoSocial();
+      case "Change Password":
+        return const ChangePasswordView();
       default:
         return const HomePageView();
     }
@@ -106,7 +118,8 @@ class _HomePageViewState extends State<HomePageView> {
           ],
         ),
       ),
-      body: const DashboardView(),
+      // body: const DashboardView(),
+      body: const PotentialJobs(),
     );
   }
 }

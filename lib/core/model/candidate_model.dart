@@ -8,6 +8,11 @@ class Candidate {
   final String? resume;
   final String? preferredCity;
   final String? preferredState;
+  final String? profileImage;
+  final String? skills;
+  final String? experience;
+  final String? prevJobTitles;
+  final String? suggestedJobs;
 
   Candidate({
     required this.id,
@@ -19,6 +24,11 @@ class Candidate {
     this.resume,
     this.preferredCity,
     this.preferredState,
+    this.profileImage,
+    this.skills,
+    this.experience,
+    this.prevJobTitles,
+    this.suggestedJobs,
   });
 
   factory Candidate.fromJson(Map<String, dynamic> json) {
@@ -32,6 +42,11 @@ class Candidate {
       resume: json['resume'],
       preferredCity: json['preferred_city'],
       preferredState: json['preferred_state'],
+      profileImage: json['profile_image'],
+      skills: json['skills'],
+      experience: json['experience'],
+      prevJobTitles: json['previous_job_titles'],
+      suggestedJobs: json['suggested_jobs'],
     );
   }
 }
